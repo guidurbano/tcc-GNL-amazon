@@ -1,0 +1,13 @@
+rio: 'Amazonas'  # Amazonas, Solimoes, Mamadeira
+horizonte: 7  # 7, 14, 21
+
+data_paths:
+  loc: '\\data\\routes\\freq_visits\\Amazonas.parquet'
+  routes: '\\data\\routes\\rotas_Amazonas.parquet'
+  patterns: '\\data\\routes\\departure_patterns\\7_days.xlsx'
+
+corridor_factor: 0.9
+fixed_conversion: 11.76
+consumption: 150
+price_gnl: 1.97
+price_liquid: 1.10
