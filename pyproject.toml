@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "tcc-gnl-amazon"
+version = "0.1.0"
+description = ""
+authors = ["guilhermedurbano <guilhermedurbano@gmail.com>"]
+readme = "README.md"
+packages = [{include = "tcc_gnl_amazon"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+gurobipy = "^9.5.2"
+numpy = "^1.23.3"
+pandas = "^1.5.0"
+pyaml = "^21.10.1"
+pyarrow = "^9.0.0"
+openpyxl = "^3.0.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
