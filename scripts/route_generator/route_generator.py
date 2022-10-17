@@ -11,17 +11,20 @@ with open('scripts\\route_generator\\config.yaml', 'r') as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
 
 rio = config['rio']
-cap_max = config['cap_max']
-vel_media = config['vel_media']
-t_carregamento = config['t_carregamento']
+capacities = config['cap_max']
+vel_media = config['vel_media'] * 1.852
+t_carregamento = config['t_carregamento'] * 4 / 60
 
 # Import data
 cwd = os.getcwd()
 df_dist = pd.read_excel(cwd + config['data_paths']['dist'], index_col=0)
-df_loc = pd.read_parquet(cwd + config['data_paths']['loc'] + '{}.parquet'.format(rio))
+df_loc = pd.read_parquet(
+    cwd + config['data_paths']['loc'] + '{}.parquet'.format(rio))
+
 
 def make_route(data: pd.DataFrame,
                df_dist: pd.DataFrame,
+               cap_max: float,
                rio: str) -> pd.DataFrame:
 
     # Ordenar localidades por distancia a Manaus
@@ -117,6 +120,7 @@ def make_route(data: pd.DataFrame,
     rotas = pd.DataFrame.from_dict(cols, orient='index').T
     rotas['vetor_loc_rota'] = rotas['nos'].apply(_loc_belong_route,
                                                  locs_ordered=locs_ordered)
+    rotas['capacidade'] = cap_max
 
     return rotas
 
@@ -129,9 +133,17 @@ def _loc_belong_route(data: pd.DataFrame, locs_ordered: list):
     return vetor_Q
 
 
-# Run and store
-routes = make_route(data=df_loc,
-                    df_dist=df_dist,
-                    rio=rio)
-route_folder = config['data_paths']['routes_folder']
-routes.to_parquet(route_folder + f'rotas_{rio}.parquet')
+# Run for multiple vehicles
+routes_full = pd.DataFrame()
+for i, cap_max in enumerate(capacities):
+    routes = make_route(data=df_loc,
+                        cap_max=cap_max,
+                        df_dist=df_dist,
+                        rio=rio)
+    routes['tipo_veic'] = i + 1
+    routes_full = pd.concat([routes_full, routes],
+                            ignore_index=True)
+
+# Save
+route_folder = cwd + config['data_paths']['routes_folder']
+routes_full.to_parquet(route_folder + f'rotas_{rio}_k_{len(capacities)}.parquet')
