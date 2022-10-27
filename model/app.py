@@ -33,7 +33,7 @@ cost_per_hour = config['consumption'] * (
     config['price_gnl'] + config['price_liquid'])
 CF, C = list(), list()
 for cap in capacities:
-    CF.append(cap * config['corridor_factor'] * config['fixed_conversion'])
+    CF.append(cap * config['fixed_conversion'])
     C.append(df_routes['tempo_nav'].apply(lambda x: x * cost_per_hour).tolist())
 
 # Create a new model
@@ -52,11 +52,11 @@ Q = df_routes['vetor_loc_rota'].tolist()
 P = df_patterns.values.tolist()
 
 
-def _vetor_A(r, k, u, t, H=H):
+def _vetor_A(r, k, u, t, H):
     duration = np.ceil(df_routes.iloc[R_k[k][r]]['tempo_ciclo'])
     end = (u + duration - 1) % H
     if end == 0:
-        end = 7
+        end = H
     if t <= end:
         return 1
     else:
@@ -90,7 +90,7 @@ c2_4 = model.addConstrs(
     for t in range(len(T)) for j in range(len(J)))
 
 c2_5 = model.addConstrs(
-    gp.quicksum(x[(k, r, u)] * _vetor_A(r, k, u, t)
+    gp.quicksum(x[(k, r, u)] * _vetor_A(r, k, u, t, H=H)
                 for r in range(len(R_k[k])) for u in range(len(T))) <=
     n[(k)]
     for k in range(len(K)) for t in range(len(T)))
@@ -104,6 +104,7 @@ model.printAttr('x')
 model.printAttr('objVal')
 model.write(out_file + '.json')
 model.write(out_file + '.sol')
+model.write(out_file + '.lp')
 
 
 # Debug

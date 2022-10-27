@@ -1,5 +1,5 @@
 # Solution for model gnl_amazon
-# Objective value = 3.6186515879999995e+07
+# Objective value = 4.0172191571880005e+10
 b[0,0] 0
 b[0,1] 0
 b[0,2] 0

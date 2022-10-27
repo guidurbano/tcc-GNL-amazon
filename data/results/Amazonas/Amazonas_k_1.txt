@@ -1,34 +1,37 @@
 Gurobi Optimizer version 9.5.2 build v9.5.2rc0 (win64)
 Thread count: 4 physical cores, 8 logical processors, using up to 8 threads
 Optimize a model with 63 rows, 1051 columns and 7179 nonzeros
-Model fingerprint: 0xf051932b
+Model fingerprint: 0xa69d9c5b
 Variable types: 0 continuous, 1051 integer (1050 binary)
 Coefficient statistics:
   Matrix range     [1e+00, 1e+00]
-  Objective range  [6e+03, 2e+07]
+  Objective range  [6e+03, 2e+10]
   Bounds range     [1e+00, 1e+00]
   RHS range        [1e+00, 1e+00]
-Found heuristic solution: objective 9.047541e+07
+Warning: Model contains large objective coefficients
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+Found heuristic solution: objective 1.004305e+11
 Presolve removed 55 rows and 928 columns
 Presolve time: 0.02s
 Presolved: 8 rows, 123 columns, 482 nonzeros
-Found heuristic solution: objective 3.618652e+07
+Found heuristic solution: objective 4.017219e+10
 Variable types: 0 continuous, 123 integer (122 binary)
 
-Root relaxation: objective 2.262616e+07, 16 iterations, 0.00 seconds (0.00 work units)
+Root relaxation: objective 2.510763e+10, 16 iterations, 0.00 seconds (0.00 work units)
 
     Nodes    |    Current Node    |     Objective Bounds      |     Work
  Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
 
-     0     0 infeasible    0      3.6187e+07 3.6187e+07  0.00%     -    0s
+     0     0 infeasible    0      4.0172e+10 4.0172e+10  0.00%     -    0s
 
-Explored 1 nodes (76 simplex iterations) in 0.04 seconds (0.02 work units)
+Explored 1 nodes (72 simplex iterations) in 0.04 seconds (0.02 work units)
 Thread count was 8 (of 8 available processors)
 
-Solution count 2: 3.61865e+07 9.04754e+07
+Solution count 2: 4.01722e+10 1.0043e+11
 
 Optimal solution found (tolerance 1.00e-04)
-Best objective 3.618651588000e+07, best bound 3.618651588000e+07, gap 0.0000%
+Best objective 4.017219157188e+10, best bound 4.017219157188e+10, gap 0.0000%
 
 Solution quality statistics for model gnl_amazon :
   Maximum violation:
@@ -41,7 +44,7 @@ Statistics for modelgnl_amazon:
   Variable types              : 0 Continuous,
 1051 Integer (1050 Binary)
   Matrix coefficient range    : [ 1, 1 ]
-  Objective coefficient range : [ 6064.79, 1.80775e+07 ]
+  Objective coefficient range : [ 6064.79, 2.00861e+10 ]
   Variable bound range        : [ 1, 1 ]
   RHS coefficient range       : [ 1, 1 ]
 
@@ -60,4 +63,4 @@ Statistics for modelgnl_amazon:
 
       objVal
 ------------
- 3.61865e+07
+ 4.01722e+10
