@@ -9,7 +9,7 @@ import yaml
 with open('model\\config.yaml', 'r') as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
 
-rio = config['rio']  # Solimoes, Madeira
+rio = config['rio']
 H = config['horizonte']
 num_veic = config['num_veic']
 capacities = config['capacities'][:num_veic]
@@ -21,20 +21,19 @@ df_loc = pd.read_parquet(
     cwd + config['data_paths']['loc'] + '{}.parquet'.format(rio))
 df_routes = pd.read_parquet(
     cwd + config['data_paths']['routes'] + \
-         'rotas_{}_k_{}.parquet'.format(rio, num_veic))
+         'rotas_{}_k_{}.parquet'.format(rio, capacities))
 
 df_patterns = pd.read_excel(
     cwd + config['data_paths']['patterns'] + '{}_days.xlsx'.format(H),
     usecols=days)
 
-# Calculate cost for each vehicle
-# TODO: functional but could be improved
-cost_per_hour = config['consumption'] * (
-    config['price_gnl'] + config['price_liquid'])
-CF, C = list(), list()
-for cap in capacities:
-    CF.append(cap * config['fixed_conversion'])
-    C.append(df_routes['tempo_nav'].apply(lambda x: x * cost_per_hour).tolist())
+# Cost for each vehicle (daily)
+CF = config['fixed_cost'][:num_veic]
+cost_per_day = config['transport_cost'][:num_veic]
+C = list()
+for k in range(1, num_veic + 1):
+    C.append(df_routes.loc[df_routes.tipo_veic == k]['tempo_nav'].apply(
+        lambda x: x / 24 * cost_per_day[k - 1]).tolist())
 
 # Create a new model
 model = gp.Model('gnl_amazon')
@@ -69,11 +68,15 @@ x = model.addVars(len(K), len(R), len(T), vtype=gp.GRB.BINARY, name='x')
 n = model.addVars(len(K), lb=0, vtype=gp.GRB.INTEGER, name='n')
 
 # Objective Function
-model.setObjective(gp.quicksum(
-    C[k][r] * x[(k, r, t)] + CF[k] * n[(k)]
-    for k in range(len(K))
-    for r in range(len(R))
-    for t in range(len(T))),
+model.setObjective(
+    gp.quicksum(
+        C[k][r] * x[(k, r, t)]
+        for k in range(len(K))
+        for r in range(len(R_k[k]))
+        for t in range(len(T))) +
+    gp.quicksum(
+        CF[k] * n[(k)]
+        for k in range(len(K))),
     sense=gp.GRB.MINIMIZE)
 
 # Restrictions
@@ -84,7 +87,7 @@ c2_3 = model.addConstrs(
 
 c2_4 = model.addConstrs(
     gp.quicksum(x[(k, r, t)] * Q[r][j]
-                for k in range(len(K)) for r in range(len(R))) ==
+                for k in range(len(K)) for r in range(len(R_k[k]))) ==
     gp.quicksum(b[(j, s)] * P[s][t]
                 for s in range(len(S_j[j])))
     for t in range(len(T)) for j in range(len(J)))
@@ -95,8 +98,9 @@ c2_5 = model.addConstrs(
     n[(k)]
     for k in range(len(K)) for t in range(len(T)))
 
+# Results and debug
 out_file = cwd + config['data_paths']['results'] + '{}\\{}_k_{}'.format(
-    rio, rio, num_veic)
+    rio, rio, capacities)
 model.optimize()
 model.printQuality()
 model.printStats()
@@ -105,9 +109,3 @@ model.printAttr('objVal')
 model.write(out_file + '.json')
 model.write(out_file + '.sol')
 model.write(out_file + '.lp')
-
-
-# Debug
-if not model.feasibility:
-    model.computeIIS()
-    model.write("model.ilp")

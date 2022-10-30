@@ -146,4 +146,5 @@ for i, cap_max in enumerate(capacities):
 
 # Save
 route_folder = cwd + config['data_paths']['routes_folder']
-routes_full.to_parquet(route_folder + f'rotas_{rio}_k_{len(capacities)}.parquet')
+str_fleet = 'k_' + str(capacities)
+routes_full.to_parquet(route_folder + f'rotas_{rio}_{str_fleet}.parquet')
