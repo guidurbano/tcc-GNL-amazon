@@ -1,6 +1,6 @@
-rio: 'Madeira' # 'Amazonas', 'Madeira', 'Solimoes'
+rio: 'Solimoes' # 'Amazonas', 'Madeira', 'Solimoes'
 
-cap_max: [35] # [35, 11, 8] -> capacity: [2000, 600, 400] * 0.9 / 50 = 36
+cap_max: [35, 42, 77] # [35, 42, 77] -> capacity: 2000 * 0.9 / 50 = 36
 vel_media: 10 # km/h
 t_carregamento: 5 # min
 
