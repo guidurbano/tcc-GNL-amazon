@@ -82,14 +82,14 @@ model.setObjective(
 # Restrictions
 c2_3 = model.addConstrs(
     gp.quicksum(b[(j, s)]
-                for s in range(len(S_j[j]))) == 1
+                for s in S_j[j]) == 1
     for j in range(len(J)))
 
 c2_4 = model.addConstrs(
     gp.quicksum(x[(k, r, t)] * Q[r][j]
                 for k in range(len(K)) for r in range(len(R_k[k]))) ==
     gp.quicksum(b[(j, s)] * P[s][t]
-                for s in range(len(S_j[j])))
+                for s in S_j[j])
     for t in range(len(T)) for j in range(len(J)))
 
 c2_5 = model.addConstrs(
