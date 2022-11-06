@@ -24,8 +24,9 @@ df_routes = pd.read_parquet(
          'rotas_{}_k_{}.parquet'.format(rio, capacities))
 
 df_patterns = pd.read_excel(
-    cwd + config['data_paths']['patterns'] + '{}_days.xlsx'.format(H),
-    usecols=days)
+    cwd + config['data_paths']['patterns'] + '{}_days.xlsx'.format(H)).drop(
+        columns=['num', 'freq']
+    )
 
 # Cost for each vehicle (daily)
 CF = config['fixed_cost'][:num_veic]
