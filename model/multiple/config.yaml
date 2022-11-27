@@ -1,0 +1,17 @@
+rio: ['Amazonas', 'Madeira']  # Amazonas, Madeira, Solimoes
+horizonte: [7, 14]  # 7, 14, 21
+num_veic: 1
+capacities: [35] # [35, 42, 77]
+fixed_cost: [15] # [15, 18, 33]
+transport_cost: [0.012] # [0.012, 0.014, 0.018]
+
+data_paths:
+  loc: '\\data\\preprocessing\\demands\\'
+  routes: '\\data\\preprocessing\\routes\\'
+  patterns: '\\data\\preprocessing\\departure_patterns\\'
+  results: '\\data\\results\\'
+
+fixed_conversion: 11760
+consumption: 150
+price_gnl: 1.97
+price_liquid: 1.10
