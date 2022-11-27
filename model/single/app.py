@@ -6,7 +6,7 @@ import pandas as pd
 import yaml
 
 # Config
-with open('model\\config.yaml', 'r') as f:
+with open('model\\single\\config.yaml', 'r') as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
 
 rio = config['rio']

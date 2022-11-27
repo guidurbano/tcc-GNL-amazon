@@ -143,7 +143,7 @@ for i, cap_max in enumerate(capacities):
     routes['tipo_veic'] = i + 1
     routes_full = pd.concat([routes_full, routes],
                             ignore_index=True)
-
+routes_full['rio'] = rio
 # Save
 route_folder = cwd + config['data_paths']['routes_folder']
 str_fleet = 'k_' + str(capacities)
