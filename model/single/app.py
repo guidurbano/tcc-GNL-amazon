@@ -6,7 +6,7 @@ import pandas as pd
 import yaml
 
 # Config
-with open('model\\config.yaml', 'r') as f:
+with open('model\\single\\config.yaml', 'r') as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
 
 rio = config['rio']
@@ -24,16 +24,17 @@ df_routes = pd.read_parquet(
          'rotas_{}_k_{}.parquet'.format(rio, capacities))
 
 df_patterns = pd.read_excel(
-    cwd + config['data_paths']['patterns'] + '{}_days.xlsx'.format(H),
-    usecols=days)
+    cwd + config['data_paths']['patterns'] + '{}_days.xlsx'.format(H)).drop(
+        columns=['num', 'freq']
+    )
 
 # Cost for each vehicle (daily)
 CF = config['fixed_cost'][:num_veic]
 cost_per_day = config['transport_cost'][:num_veic]
 C = list()
-for k in range(1, num_veic + 1):
-    C.append(df_routes.loc[df_routes.tipo_veic == k]['tempo_nav'].apply(
-        lambda x: x / 24 * cost_per_day[k - 1]).tolist())
+for _k in range(1, num_veic + 1):
+    C.append(df_routes.loc[df_routes.tipo_veic == _k]['tempo_nav'].apply(
+        lambda x: x / 24 * cost_per_day[_k - 1]).tolist())
 
 # Create a new model
 model = gp.Model('gnl_amazon')
@@ -52,15 +53,34 @@ P = df_patterns.values.tolist()
 
 
 def _vetor_A(r, k, u, t, H):
-    duration = np.ceil(df_routes.iloc[R_k[k][r]]['tempo_ciclo'])
+    duration = np.ceil(df_routes.iloc[R_k[k][r]]['tempo_ciclo']  / 24)
     end = (u + duration - 1) % H
     if end == 0:
         end = H
-    if t <= end:
+    if (t == u) | (t == end):
         return 1
+    elif u == end:
+        if t == u:
+            return 1
+        else:
+            return 0
     else:
-        return 0
-
+        if t < end:
+            if end > u:
+                if t > u:
+                    return 1
+                else:
+                    return 0
+            else:
+                return 1
+        if t > end:
+            if end < u:
+                if t < u:
+                    return 0
+                else:
+                    return 1
+            else:
+                return 0
 
 # Create variables
 b = model.addVars(len(J), len(S), vtype=gp.GRB.BINARY, name='b')
@@ -93,7 +113,7 @@ c2_4 = model.addConstrs(
     for t in range(len(T)) for j in range(len(J)))
 
 c2_5 = model.addConstrs(
-    gp.quicksum(x[(k, r, u)] * _vetor_A(r, k, u, t, H=H)
+    gp.quicksum(x[(k, r, u)] * _vetor_A(r, k, u=u+1, t=t+1, H=H)
                 for r in range(len(R_k[k])) for u in range(len(T))) <=
     n[(k)]
     for k in range(len(K)) for t in range(len(T)))
